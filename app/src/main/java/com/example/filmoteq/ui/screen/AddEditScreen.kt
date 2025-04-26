@@ -67,18 +67,21 @@ fun AddEditFilmScreen(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(padding)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Box(
                 Modifier
                     .size(400.dp)
+                    .padding(24.dp)
                     .clickable { launcher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
                 if (posterUri != null) {
-                    AsyncImage(model = posterUri, contentDescription = stringResource(R.string.poster))
+                    AsyncImage(model = posterUri,
+                        contentDescription = stringResource(R.string.poster),
+                        modifier = Modifier.fillMaxSize(),)
                 } else {
                     Text(
                         stringResource(R.string.tap_to_add_photo),
@@ -93,9 +96,11 @@ fun AddEditFilmScreen(
                 onValueChange = { title = it.trim() },
                 label = { Text(stringResource(R.string.title)) },
                 isError = title.isBlank(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             )
-            TextButton(onClick = { showDatePicker = true }) {
+            TextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(stringResource(R.string.release_date, releaseDate.format(DateTimeFormatter.ISO_DATE)))
             }
             if (showDatePicker) {
@@ -108,7 +113,7 @@ fun AddEditFilmScreen(
                         override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                             return utcTimeMillis <= maxDateMillis
                         }
-                    }
+                    },
                 )
                 DatePickerDialog(
                     onDismissRequest = { showDatePicker = false },
@@ -122,23 +127,30 @@ fun AddEditFilmScreen(
                             showDatePicker = false
                         }) { Text(stringResource(R.string.ok)) }
                     },
+
                     dismissButton = {
                         TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
-                    }
+                    },
                 ) {
                     DatePicker(state = datePickerState)
                 }
             }
-            Text(stringResource(R.string.category_colon))
+            Text(stringResource(R.string.category_colon), modifier = Modifier.padding(horizontal = 16.dp))
             Category.entries.forEach { cat ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
                     RadioButton(selected = cat == category, onClick = { category = cat })
                     Text(cat.name)
                 }
             }
-            Text(stringResource(R.string.status_colon))
+            Text(stringResource(R.string.status_colon), modifier = Modifier.padding(horizontal = 16.dp))
             Status.entries.forEach { st ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
                     RadioButton(selected = st == status, onClick = { status = st })
                     Text(st.name)
                 }
@@ -150,7 +162,9 @@ fun AddEditFilmScreen(
                     label = { Text(stringResource(R.string.rating_0_10)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = rating.toIntOrNull() !in 0..10,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     supportingText = {
                         if (rating.isNotEmpty() && rating.toIntOrNull() !in 1..10) {
                             Text(stringResource(R.string.enter_rating_1_10))
@@ -176,7 +190,9 @@ fun AddEditFilmScreen(
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 enabled = title.isNotBlank() &&
                         (status != Status.Obejrzany || (rating.toIntOrNull() in 1..10))
             ) {

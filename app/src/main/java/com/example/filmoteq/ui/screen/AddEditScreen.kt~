@@ -15,10 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.filmoteq.R
 import com.example.filmoteq.model.Category
 import com.example.filmoteq.model.Film
 import com.example.filmoteq.model.Status
@@ -53,10 +56,10 @@ fun AddEditFilmScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (film == null) "Dodaj film" else "Edytuj film") },
+                title = { Text(if (film == null) stringResource(R.string.add_film) else stringResource(R.string.edit_film)) },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wstecz")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -65,21 +68,24 @@ fun AddEditFilmScreen(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(padding)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Box(
                 Modifier
                     .size(400.dp)
+                    .padding(24.dp)
                     .clickable { launcher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
                 if (posterUri != null) {
-                    AsyncImage(model = posterUri, contentDescription = "Plakat")
+                    AsyncImage(model = posterUri,
+                        contentDescription = stringResource(R.string.poster),
+                        modifier = Modifier.fillMaxSize(),)
                 } else {
                     Text(
-                        "Tapnij, aby dodać zdjęcie",
+                        stringResource(R.string.tap_to_add_photo),
                         color = Color.DarkGray,
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center
@@ -89,12 +95,14 @@ fun AddEditFilmScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it.trim() },
-                label = { Text("Tytuł") },
+                label = { Text(stringResource(R.string.title)) },
                 isError = title.isBlank(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             )
-            TextButton(onClick = { showDatePicker = true }) {
-                Text("Data premiery: ${releaseDate.format(DateTimeFormatter.ISO_DATE)}")
+            TextButton(onClick = { showDatePicker = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
+                Text(stringResource(R.string.release_date, releaseDate.format(DateTimeFormatter.ISO_DATE)))
             }
             if (showDatePicker) {
                 val datePickerState = rememberDatePickerState(
@@ -106,7 +114,7 @@ fun AddEditFilmScreen(
                         override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                             return utcTimeMillis <= maxDateMillis
                         }
-                    }
+                    },
                 )
                 DatePickerDialog(
                     onDismissRequest = { showDatePicker = false },
@@ -118,25 +126,32 @@ fun AddEditFilmScreen(
                                     .toLocalDate()
                             }
                             showDatePicker = false
-                        }) { Text("OK") }
+                        }) { Text(stringResource(R.string.ok)) }
                     },
+
                     dismissButton = {
-                        TextButton(onClick = { showDatePicker = false }) { Text("Anuluj") }
-                    }
+                        TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
+                    },
                 ) {
                     DatePicker(state = datePickerState)
                 }
             }
-            Text("Kategoria:")
+            Text(stringResource(R.string.category_colon), modifier = Modifier.padding(horizontal = 16.dp))
             Category.entries.forEach { cat ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
                     RadioButton(selected = cat == category, onClick = { category = cat })
                     Text(cat.name)
                 }
             }
-            Text("Status:")
+            Text(stringResource(R.string.status_colon), modifier = Modifier.padding(horizontal = 16.dp))
             Status.entries.forEach { st ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
                     RadioButton(selected = st == status, onClick = { status = st })
                     Text(st.name)
                 }
@@ -145,13 +160,15 @@ fun AddEditFilmScreen(
                 OutlinedTextField(
                     value = rating,
                     onValueChange = { rating = it.filter(Char::isDigit) },
-                    label = { Text("Ocena (0–10)") },
+                    label = { Text(stringResource(R.string.rating_0_10)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = rating.toIntOrNull() !in 0..10,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     supportingText = {
                         if (rating.isNotEmpty() && rating.toIntOrNull() !in 1..10) {
-                            Text("Wpisz liczbę od 1 do 10")
+                            Text(stringResource(R.string.enter_rating_1_10))
                         }
                     }
                 )
@@ -174,11 +191,13 @@ fun AddEditFilmScreen(
                         )
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 enabled = title.isNotBlank() &&
                         (status != Status.Obejrzany || (rating.toIntOrNull() in 1..10))
             ) {
-                Text("Zapisz")
+                Text(stringResource(R.string.save))
             }
         }
     }
