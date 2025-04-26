@@ -20,4 +20,4 @@ Kotlin + Jetpack Compose
 
 ## Screenshot
 
-![Filmoteka Screenshot]([https://pplx-res.cloudinary.com/image/private/user_uploads/xsMxBkLtFHpDNbQ/image.jpg](https://i.imgur.com/eYOBsyY.png))
+![Filmoteka Screenshot](https://i.imgur.com/eYOBsyY.png)
