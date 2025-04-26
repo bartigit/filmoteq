@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Filmoteq</string>
+    <string name="add_film">Dodaj film</string>
+    <string name="edit_film">Edytuj film</string>
+    <string name="back">Wstecz</string>
+    <string name="tap_to_add_photo">Tapnij, aby dodać zdjęcie</string>
+    <string name="title">Tytuł</string>
+    <string name="release_date">Data premiery: %1$s</string>
+    <string name="category">Kategoria:</string>
+    <string name="status">Status:</string>
+    <string name="rating">Ocena (0–10)</string>
+    <string name="enter_rating_1_10">Wpisz liczbę od 1 do 10</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Anuluj</string>
+    <string name="save">Zapisz</string>
+    <string name="filter">Filtruj</string>
+    <string name="found">Znaleziono</string>
+    <string name="all">Wszystkie</string>
+    <string name="edit_denied_title">Edycja niedozwolona</string>
+    <string name="edit_denied_message">Nie można edytować obejrzanego filmu.</string>
+    <string name="delete_film">Usuń film</string>
+    <string name="delete_film_message">Czy na pewno usunąć film z kolekcji?</string>
+    <string name="delete">Usuń</string>
+    <string name="category_colon">Kategoria:</string>
+    <string name="status_colon">Status:</string>
+    <string name="rating_0_10">Ocena (0–10)</string>
+    <string name="poster">Plakat</string>
+    <string name="category_with_value">Kategoria: %1$s</string>
+    <string name="status_with_value">Status: %1$s</string>
+    <string name="rating_with_value">Ocena: %1$d/10</string>
+    <string name="filter_films">Filtruj filmy</string>
+    <string name="clear_filters">Usuń filtry</string>
+    <string name="apply">Zastosuj</string>
+
+
+</resources>

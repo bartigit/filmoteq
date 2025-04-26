@@ -1,0 +1,72 @@
+package com.example.filmoteq.ui.component
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.example.filmoteq.R
+import com.example.filmoteq.model.Film
+import com.example.filmoteq.model.Status
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FilmItem(
+    film: Film,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+    ) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(film.posterUri)
+                    .crossfade(true)
+                    .build()
+            )
+            Image(
+                painter = painter,
+                contentDescription = stringResource(R.string.poster),
+                modifier = Modifier.size(100.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(film.title, style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.release_date, film.releaseDate.toString()))
+                Text(stringResource(R.string.category_with_value, film.category.toString()))
+                if (film.status == Status.Obejrzany && film.rating != null) {
+                    Text(stringResource(R.string.rating_with_value, film.rating!!))
+                } else {
+                    Text(stringResource(R.string.status_with_value, film.status.toString()))
+                }
+            }
+        }
+    }
+}

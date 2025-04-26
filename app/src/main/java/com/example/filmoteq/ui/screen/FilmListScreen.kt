@@ -1,0 +1,189 @@
+package com.example.filmoteq.ui.screen
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.example.filmoteq.R
+import com.example.filmoteq.model.Film
+import com.example.filmoteq.model.Status
+import com.example.filmoteq.ui.component.FilmItem
+import com.example.filmoteq.ui.component.FilterDialog
+import com.example.filmoteq.viewmodel.FilmViewModel
+import java.util.UUID
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilmListScreen(
+    filmViewModel: FilmViewModel,
+    onAdd: () -> Unit,
+    onEdit: (UUID) -> Unit
+) {
+    var showFilter by remember { mutableStateOf(false) }
+    var showEditedDenied by remember { mutableStateOf(false) }
+    var filmToDelete by remember { mutableStateOf<Film?>(null) }
+    val films by remember { derivedStateOf { filmViewModel.getFilteredFilms() } }
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(192.dp)
+                    )
+                }
+            )
+        },
+        bottomBar = {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = onAdd) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.add_film))
+                }
+                Button(onClick = { showFilter = true }) {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.filter))
+                }
+            }
+        }
+    ) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            Text("${stringResource(R.string.found)}: ${films.size}", Modifier.padding(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment   = Alignment.CenterVertically
+            ) {
+                Text(
+                    text     = "${stringResource(R.string.category)} ${filmViewModel.selectedCategory?.name ?: stringResource(R.string.all)}",
+                    style    = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text     = "${stringResource(R.string.status)} ${filmViewModel.selectedStatus?.name ?: stringResource(R.string.all)}",
+                    style    = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(films) { film ->
+                    FilmItem(
+                        film = film,
+                        onClick = {
+                            if (film.status == Status.Nieobejrzany) {
+                                onEdit(film.id)
+                            } else {
+                                showEditedDenied = true
+                            }
+                        },
+                        onLongClick = {
+                            filmToDelete = film
+                        }
+                    )
+                }
+            }
+        }
+
+        if (showEditedDenied) {
+            AlertDialog(
+                onDismissRequest = { showEditedDenied = false },
+                title = { Text(stringResource(R.string.edit_denied_title)) },
+                text = { Text(stringResource(R.string.edit_denied_message)) },
+                confirmButton = {
+                    TextButton(onClick = { showEditedDenied = false }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                }
+            )
+        }
+
+        filmToDelete?.let { film ->
+            AlertDialog(
+                onDismissRequest = { filmToDelete = null },
+                title = { Text(stringResource(R.string.delete_film)) },
+                text = { Text(stringResource(R.string.delete_film_message, film.title)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        filmViewModel.deleteFilm(film)
+                        filmToDelete = null
+                    }) {
+                        Text(stringResource(R.string.delete))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { filmToDelete = null }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+    }
+
+    if (showFilter) {
+        FilterDialog(
+            initialCategory = filmViewModel.selectedCategory,
+            initialStatus   = filmViewModel.selectedStatus,
+            onDismiss       = { showFilter = false },
+            onApply         = { cat, st ->
+                filmViewModel.selectedCategory = cat
+                filmViewModel.selectedStatus   = st
+                showFilter = false
+            },
+            onClearFilters  = {
+                filmViewModel.clearFilters()
+                showFilter = false
+            }
+        )
+    }
+}
